@@ -5,6 +5,8 @@ class Club(models.Model):
 # assuming this is the PK
     ClubName = models.CharField(max_length=255, blank=True, null=True)
     ClubType = models.CharField(max_length=50, blank=True, null=True)
+
+    
     InauguratedOn = models.DateField(blank=True, null=True)
     CharteredOn = models.DateField(blank=True, null=True)
     SponsoredClub1 = models.CharField(max_length=255, null=True, blank=True)
