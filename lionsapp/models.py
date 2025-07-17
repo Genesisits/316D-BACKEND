@@ -5,11 +5,10 @@ class Club(models.Model):
 # assuming this is the PK
     ClubName = models.CharField(max_length=255, blank=True, null=True)
     ClubType = models.CharField(max_length=50, blank=True, null=True)
-    RegionName = models.CharField(max_length=50, blank=True, null=True)
-    ZoneName = models.CharField(max_length=50, blank=True, null=True)
     InauguratedOn = models.DateField(blank=True, null=True)
     CharteredOn = models.DateField(blank=True, null=True)
-    SponsoredClub = models.CharField(max_length=255, blank=True, null=True)
+    SponsoredClub1 = models.CharField(max_length=255, null=True, blank=True)
+    SponsoredClub2 = models.CharField(max_length=255, null=True, blank=True)
     ExtensionChairperson1 = models.CharField(max_length=50, blank=True, null=True)
     ExtensionChairperson2 = models.CharField(max_length=50, blank=True, null=True)
     GuidingLion1 = models.CharField(max_length=50, blank=True, null=True)

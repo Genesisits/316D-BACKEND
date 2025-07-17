@@ -1,0 +1,23 @@
+{
+  "info": {
+    "name": "316",
+    "_postman_id": "316-auto-generated",
+    "description": "All API endpoints for 316 project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "clubs", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/clubs/" } },
+    { "name": "clubofficers", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/clubofficers/" } },
+    { "name": "contestrules", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/contestrules/" } },
+    { "name": "districtcabinet", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/districtcabinet/" } },
+    { "name": "districtleaders", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/districtleaders/" } },
+    { "name": "districtofficers", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/districtofficers/" } },
+    { "name": "memberdetails", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/memberdetails/" } },
+    { "name": "mjf", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/mjf/" } },
+    { "name": "signup", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/signup/" } },
+    { "name": "activityreport", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/activityreport/" } },
+    { "name": "contestclaims", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/contestclaims/" } },
+    { "name": "memberadditionaldetails", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/memberadditionaldetails/" } },
+    { "name": "memberphotos", "request": { "method": "GET", "url": "http://148.135.136.60:9000/api/memberphotos/" } }
+  ]
+}
