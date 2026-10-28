@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--_#tj-aztqs)o%*lvxk0#e2+jo0go%1x%apmbsj0e@v1j^q=-%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["148.135.136.60",'127.0.0.1']
+ALLOWED_HOSTS = ['lionsclub.genesisits.com','www.lionsclub.genesisits.com',"148.135.136.60",]
 
 
 # Application definition
@@ -84,6 +84,7 @@ DATABASES = {
         'PORT': '1234',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
+            'extra_params': 'TrustServerCertificate=yes;',
         },
     }
 }
