@@ -78,7 +78,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'NAME': 'lions316dDB',
         'USER': 'gandhi',
-        'PASSWORD': '316D@L!Ons',
+        'PASSWORD': '316D@L!0ns',
         'HOST': 'zwin01.securehostdns.com',
         'PORT': '1234',
         'OPTIONS': {

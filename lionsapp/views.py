@@ -1,100 +1,230 @@
-from rest_framework import viewsets
-from .models import Club
-from .serializers import ClubSerializer
+from datetime import date, datetime
+from decimal import Decimal
+
+from django.db import connection
+from rest_framework import serializers, viewsets
+from rest_framework.response import Response
+
+from .models import (
+    Club,
+    ClubOfficers,
+    ContestRules,
+    DistrictCabinet,
+    DistrictLeaders,
+    DistrictOfficers,
+    MemberDetails,
+    MJF,
+    Signup,
+    ActivityReport,
+    ContestClaim,
+    MemberAdditionalDetails,
+    MemberPhoto,
+)
+
+from .serializers import (
+    ClubSerializer,
+    ClubOfficersSerializer,
+    ContestRulesSerializer,
+    DistrictCabinetSerializer,
+    DistrictLeadersSerializer,
+    DistrictOfficersSerializer,
+    MemberDetailsSerializer,
+    MJFSerializer,
+    SignupSerializer,
+    ActivityReportSerializer,
+    ContestClaimSerializer,
+    MemberAdditionalDetailsSerializer,
+    MemberPhotoSerializer,
+)
+
+
+# --------------------------------------------------
+# RAW SQL SERIALIZER
+# --------------------------------------------------
+
+class RawSQLSerializer(serializers.Serializer):
+
+    def to_representation(self, instance):
+        result = {}
+
+        for key, value in instance.items():
+            if isinstance(value, (date, datetime)):
+                value = value.isoformat()
+            elif isinstance(value, Decimal):
+                value = str(value)
+
+            result[key] = value
+
+        return result
+
+
+# --------------------------------------------------
+# COMMON READ-ONLY SQL VIEWSET
+# --------------------------------------------------
+
+class RawSQLReadOnlyViewSet(viewsets.ViewSet):
+
+    table_name = None
+    model_class = None
+
+    def list(self, request):
+
+        if not self.table_name:
+            return Response(
+                {"error": "Database table is not configured"},
+                status=500
+            )
+
+        # Map SQL Server column names to Django field names.
+        # This helps preserve the existing API response structure.
+        field_mapping = {}
+
+        if self.model_class:
+            for field in self.model_class._meta.concrete_fields:
+                column_name = field.column.strip("[]").casefold()
+                field_mapping[column_name] = field.attname
+
+        with connection.cursor() as cursor:
+
+            # Table names are fixed in the ViewSet classes below.
+            cursor.execute(
+                f"SELECT * FROM [dbo].[{self.table_name}]"
+            )
+
+            columns = [column[0] for column in cursor.description]
+            rows = cursor.fetchall()
+
+        records = []
+
+        for row in rows:
+            record = {}
+
+            for column, value in zip(columns, row):
+                api_name = field_mapping.get(
+                    column.strip("[]").casefold(),
+                    column
+                )
+
+                record[api_name] = value
+
+            records.append(record)
+
+        serializer = RawSQLSerializer(records, many=True)
+
+        return Response(serializer.data)
+
+
+# --------------------------------------------------
+# CLUB API
+# --------------------------------------------------
 
 class ClubViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
-from rest_framework import viewsets
-from .models import ClubOfficers
-from .serializers import ClubOfficersSerializer
 
-class ClubOfficersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ClubOfficers.objects.all()
-    serializer_class = ClubOfficersSerializer
-from rest_framework import viewsets
-from .models import ContestRules
-from .serializers import ContestRulesSerializer
+
+# --------------------------------------------------
+# CLUB OFFICERS API
+# --------------------------------------------------
+
+class ClubOfficersViewSet(RawSQLReadOnlyViewSet):
+    table_name = "ClubOfficersLCI"
+    model_class = ClubOfficers
+
+
+# --------------------------------------------------
+# CONTEST RULES API
+# --------------------------------------------------
 
 class ContestRulesViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    A simple ViewSet for viewing ContestRules.
-    ReadOnlyModelViewSet provides `list` and `retrieve` actions.
-    """
     queryset = ContestRules.objects.all()
     serializer_class = ContestRulesSerializer
-from rest_framework import viewsets
-from .models import DistrictCabinet
-from .serializers import DistrictCabinetSerializer
 
-class DistrictCabinetViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = DistrictCabinet.objects.all()
-    serializer_class = DistrictCabinetSerializer
-from rest_framework import viewsets
-from .models import DistrictLeaders
-from .serializers import DistrictLeadersSerializer
 
-class DistrictLeadersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = DistrictLeaders.objects.all()
-    serializer_class = DistrictLeadersSerializer
-from rest_framework import viewsets
-from .models import DistrictOfficers
-from .serializers import DistrictOfficersSerializer
+# --------------------------------------------------
+# DISTRICT CABINET API
+# --------------------------------------------------
 
-class DistrictOfficersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = DistrictOfficers.objects.all()
-    serializer_class = DistrictOfficersSerializer
-from rest_framework import viewsets
-from .models import MemberDetails
-from .serializers import MemberDetailsSerializer
+class DistrictCabinetViewSet(RawSQLReadOnlyViewSet):
+    table_name = "DistrictCabinet"
+    model_class = DistrictCabinet
 
-class MemberDetailsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = MemberDetails.objects.all()
-    serializer_class = MemberDetailsSerializer
-# views.py
-from rest_framework import viewsets
-from .models import MJF
-from .serializers import MJFSerializer
+
+# --------------------------------------------------
+# DISTRICT LEADERS API
+# --------------------------------------------------
+
+class DistrictLeadersViewSet(RawSQLReadOnlyViewSet):
+    table_name = "DistrictLeaders"
+    model_class = DistrictLeaders
+
+
+# --------------------------------------------------
+# DISTRICT OFFICERS API
+# --------------------------------------------------
+
+class DistrictOfficersViewSet(RawSQLReadOnlyViewSet):
+    table_name = "DistrictOfficersLCI"
+    model_class = DistrictOfficers
+
+
+# --------------------------------------------------
+# MEMBER DETAILS API
+# --------------------------------------------------
+
+class MemberDetailsViewSet(RawSQLReadOnlyViewSet):
+    table_name = "MemberDetailsLCI"
+    model_class = MemberDetails
+
+
+# --------------------------------------------------
+# MJF API
+# --------------------------------------------------
 
 class MJFViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MJF.objects.all()
     serializer_class = MJFSerializer
-from rest_framework import viewsets
-from .models import Signup
-from .serializers import SignupSerializer
+
+
+# --------------------------------------------------
+# SIGNUP API
+# --------------------------------------------------
 
 class SignupViewSet(viewsets.ModelViewSet):
     queryset = Signup.objects.all()
     serializer_class = SignupSerializer
-# views.py
-from rest_framework import viewsets
-from .models import ActivityReport
-from .serializers import ActivityReportSerializer
 
-class ActivityReportViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ActivityReport.objects.all()
-    serializer_class = ActivityReportSerializer
-from rest_framework import viewsets
-from .models import ContestClaim
-from .serializers import ContestClaimSerializer
+
+# --------------------------------------------------
+# ACTIVITY REPORT API
+# --------------------------------------------------
+
+class ActivityReportViewSet(RawSQLReadOnlyViewSet):
+    table_name = "ClubActivityReport"
+    model_class = ActivityReport
+
+
+# --------------------------------------------------
+# CONTEST CLAIM API
+# --------------------------------------------------
 
 class ContestClaimViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    A simple ViewSet for viewing ContestClaim data.
-    """
     queryset = ContestClaim.objects.all()
     serializer_class = ContestClaimSerializer
-from rest_framework import viewsets
-from .models import MemberAdditionalDetails
-from .serializers import MemberAdditionalDetailsSerializer
 
-class MemberAdditionalDetailsViewSet(viewsets.ModelViewSet):
-    queryset = MemberAdditionalDetails.objects.all()
-    serializer_class = MemberAdditionalDetailsSerializer
-# views.py
-from rest_framework import viewsets
-from .models import MemberPhoto
-from .serializers import MemberPhotoSerializer
+
+# --------------------------------------------------
+# MEMBER ADDITIONAL DETAILS API
+# --------------------------------------------------
+
+class MemberAdditionalDetailsViewSet(RawSQLReadOnlyViewSet):
+    table_name = "MemberDetailsActual"
+    model_class = MemberAdditionalDetails
+
+
+# --------------------------------------------------
+# MEMBER PHOTO API
+# --------------------------------------------------
 
 class MemberPhotoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MemberPhoto.objects.all()

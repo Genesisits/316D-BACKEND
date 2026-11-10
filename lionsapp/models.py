@@ -81,7 +81,7 @@ class ClubOfficers(models.Model):
     AccountName = models.CharField(max_length=255, blank=True, null=True, db_column='Account Name')
 
     class Meta:
-        db_table = 'ClubOfficers'
+        db_table = 'ClubOfficersLCI'
         managed = False
 
     def __str__(self):
